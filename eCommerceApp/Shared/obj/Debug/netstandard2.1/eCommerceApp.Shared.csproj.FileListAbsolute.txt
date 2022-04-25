@@ -1,0 +1,10 @@
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\bin\Debug\netstandard2.1\eCommerceApp.Shared.deps.json
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\bin\Debug\netstandard2.1\eCommerceApp.Shared.dll
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\bin\Debug\netstandard2.1\eCommerceApp.Shared.pdb
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\obj\Debug\netstandard2.1\eCommerceApp.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\obj\Debug\netstandard2.1\eCommerceApp.Shared.AssemblyInfoInputs.cache
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\obj\Debug\netstandard2.1\eCommerceApp.Shared.AssemblyInfo.cs
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\obj\Debug\netstandard2.1\eCommerceApp.Shared.csproj.CoreCompileInputs.cache
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\obj\Debug\netstandard2.1\eCommerceApp.Shared.dll
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\obj\Debug\netstandard2.1\eCommerceApp.Shared.pdb
+C:\Users\Alex-carreras\Desktop\eCommerceApp\eCommerceApp\Shared\obj\Debug\netstandard2.1\eCommerceApp.Shared.csproj.AssemblyReference.cache

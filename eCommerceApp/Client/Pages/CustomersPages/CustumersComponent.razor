@@ -1,0 +1,104 @@
+﻿
+@page "/customers"
+
+@inject HttpClient http
+@inject IJSRuntime Js
+
+<div class="row border-bottom">
+    <div class="col">
+        <h1>Customers</h1>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button type="button" @onclick="@(()=> customers = new Customers())" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Add
+        </button>
+    </div>
+</div>
+
+<RadzenCard>
+    @if (customersList != null)
+    {
+        @if (customersList.Count != 0)
+        {
+            <RadzenDataGrid AllowFiltering="true" @ref="grid" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="6"
+                            AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                            Data="@customersList" TItem="Customers" ColumnWidth="300px"
+                            LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Customers" Property="Name" Title="Name" Width="100px" />
+                    <RadzenDataGridColumn TItem="Customers" Property="LastName" Title="LastName" Width="100px" />
+                    <RadzenDataGridColumn TItem="Customers" Property="Address" Title="Address" Width="150px" />
+                    <RadzenDataGridColumn TItem="Customers" Property="Email" Title="Email" Width="150px" />
+                    <RadzenDataGridColumn TItem="Customers" Title="Opciones" Width="70px" Filterable="false">
+                        <Template Context="data">
+                            <div class="col d-flex justify-content-center">
+                                <RadzenButton Style="display:inline; margin-right:4px;" Icon="edit" ButtonStyle="ButtonStyle.Success" />
+                                <RadzenButton Style="display:inline" Icon="delete_forever" ButtonStyle="ButtonStyle.Danger" />
+
+                            </div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No se encontraron datos...
+            </div>
+        }
+    }
+    else
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+</RadzenCard>
+
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add customers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm Model="customers" OnValidSubmit="@PostCustomers">
+                <DataAnnotationsValidator />
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <InputText @bind-Value="customers.Name" class="form-control"></InputText>
+                        <ValidationMessage For="@(()=> customers.Name)" />
+                    </div>
+                    <div class="form-group">
+                        <label>LastName</label>
+                        <InputText @bind-Value="customers.LastName" class="form-control"></InputText>
+                        <ValidationMessage For="@(()=> customers.LastName)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <InputText class="form-control" @bind-Value="customers.Email"></InputText>
+                        <ValidationMessage For="@(()=> customers.Email)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <InputTextArea @bind-Value="customers.Address" class="form-control"></InputTextArea>
+                        <ValidationMessage For="@(()=> customers.Address)" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+

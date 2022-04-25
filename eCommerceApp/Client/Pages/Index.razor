@@ -1,0 +1,301 @@
+﻿@page "/"
+@inject IJSRuntime Js
+@using Newtonsoft.Json
+@inject HttpClient http
+
+
+
+<div class="row border-bottom">
+    <div class="col">
+        <h1>Orders</h1>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Add
+        </button>
+    </div>
+</div>
+
+<RadzenCard>
+    @if (ordersList != null)
+    {
+        @if (ordersList.Count != 0)
+        {
+            <RadzenDataGrid AllowFiltering="true" @ref="gridOrders" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="6"
+                            AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                            Data="@ordersList" TItem="Orders" ColumnWidth="300px"
+                            LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Orders" Property="OrderNumber" Title="OrderNumber" Width="100px" />
+                    <RadzenDataGridColumn TItem="Orders" Property="ProductQty" Title="ProductQty" Width="100px" />
+                    <RadzenDataGridColumn TItem="Orders" Property="CustomerId" Title="CustomerId" Width="80px" />
+                    <RadzenDataGridColumn TItem="Orders" Property="TotalOrder" Title="TotalOrder" Width="100px" />
+                    <RadzenDataGridColumn TItem="Orders" Title="Opciones" Width="70px" Filterable="false">
+                        <Template Context="data">
+                            <div class="col d-flex justify-content-center">
+                                <RadzenButton Style="display:inline; margin-right:4px;" Icon="edit" ButtonStyle="ButtonStyle.Success" />
+                                <RadzenButton Style="display:inline" Icon="delete_forever" ButtonStyle="ButtonStyle.Danger" />
+
+                            </div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No se encontraron datos...
+            </div>
+        }
+    }
+    else
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+</RadzenCard>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <h2>Venta</h2>
+                        <EditForm Model="orderDatailsPreview" OnValidSubmit="@AddList">
+                            <DataAnnotationsValidator />
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>Code product</label>
+                                        <InputText @oninput="OnInputChange" @bind-Value="orderDatailsPreview.ProductCode" class="form-control"></InputText>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>Name product</label>
+                                        <InputText disabled @bind-Value="orderDatailsPreview.NamePoduct" class="form-control"></InputText>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>Price</label>
+                                        <InputNumber disabled @bind-Value="orderDatailsPreview.Price" class="form-control"></InputNumber>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>Stock</label>
+                                        <InputNumber disabled @bind-Value="orderDatailsPreview.Stock" class="form-control"></InputNumber>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Cuantity</label>
+                                <InputNumber @bind-Value="orderDatailsPreview.Cuantity" class="form-control"></InputNumber>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Add</button>
+                        </EditForm>
+                    </div>
+                    <div class="col">
+                        <h2>Customer</h2>
+                        <div class="form-group">
+                            <label>Customers</label>
+                            <RadzenDropDown AllowClear="true"
+                                            TValue="dynamic"
+                                            AllowVirtualization="true"
+                                            class="w-100 form-control"
+                                            AllowFiltering="true"
+                                            Data=@customersList
+                                            Placeholder="Seleccione el cliente..."
+                                            TextProperty="Name"
+                                            ValueProperty="Id"
+                                            Change=@(args => OnChange(args)) />
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Products</h2>
+                @if (orderDetails != null)
+                {
+                    @if (orderDetails.Count != 0)
+                    {
+                        <div style="height:200px; overflow-y:auto;">
+                            <RadzenDataGrid AllowFiltering="true" @ref="grid" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="6"
+                                            AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                                            Data="@orderDetails" TItem="OrderDetails" ColumnWidth="300px"
+                                            LogicalFilterOperator="LogicalFilterOperator.Or">
+                                <Columns>
+                                    <RadzenDataGridColumn TItem="OrderDetails" Property="NameProduct" Title="NameProduct" Width="100px" />
+                                    <RadzenDataGridColumn TItem="OrderDetails" Property="ProductQty" Title="ProductQty" Width="80px" />
+                                    <RadzenDataGridColumn TItem="OrderDetails" Property="TotalSales" Title="TotalSales" Width="100px" />
+                                    <RadzenDataGridColumn TItem="OrderDetails" Width="70px" Filterable="false">
+                                        <Template Context="data">
+                                            <div class="col d-flex justify-content-center">
+                                                <RadzenButton Click="@(()=>DeleteProductTable(data))" Style="display:inline" Icon="delete_forever" ButtonStyle="ButtonStyle.Danger" />
+                                            </div>
+                                        </Template>
+                                    </RadzenDataGridColumn>
+                                </Columns>
+                            </RadzenDataGrid>
+                        </div>
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else
+                {
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" @onclick="PostOrder" data-bs-dismiss="modal">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    OrderDatailsPreview orderDatailsPreview = new OrderDatailsPreview();
+
+    List<OrderDetails> orderDetails = new List<OrderDetails>();
+    RadzenDataGrid<OrderDetails> grid;
+    RadzenDataGrid<Orders> gridOrders;
+    OrderDetails order = new OrderDetails();
+    Orders orders = new Orders();
+    List<Customers> customersList;
+    List<Orders> ordersList;
+    Random r = new Random();
+    string code;
+    int IdCustomer;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            customersList = await http.GetFromJsonAsync<List<Customers>>($"api/Customers");
+            ordersList = await http.GetFromJsonAsync<List<Orders>>($"api/Orders");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+    async Task AddList()
+    {
+        if (code == null)
+        {
+            code = r.Next(1000, 10000).ToString();
+        }
+        try
+        {
+            order = new OrderDetails()
+            {
+                OrderNumber = code,
+                NameProduct = orderDatailsPreview.NamePoduct,
+                ProductQty = orderDatailsPreview.Cuantity,
+                TotalSales = orderDatailsPreview.Cuantity * orderDatailsPreview.Price
+
+            };
+            orderDetails.Add(order);
+            await grid.Reload();
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    async Task PostOrder()
+    {
+        int? PQty = 0;
+        double? TO = 0;
+        foreach (var item in orderDetails)
+        {
+            PQty += item.ProductQty;
+            TO += item.TotalSales;
+        }
+
+        orders = new Orders()
+        {
+            OrderNumber = code,
+            ProductQty = (int)PQty,
+            TotalOrder = Convert.ToInt32(TO),
+            CustomerId = IdCustomer
+        };
+
+        string json = JsonConvert.SerializeObject(orders);
+        StringContent httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var responses = await http.PostAsync("api/Orders", httpContent);
+        var respuesta = await responses.Content.ReadFromJsonAsync<OrdersResponse>();
+        if (respuesta.ok)
+        {
+            await PostOrderDetails();
+            await Js.InvokeAsync<object>("Estado", "Exito", $"{respuesta.msj}", "success");
+            Limpiar();
+        }
+        else
+        {
+            await Js.InvokeAsync<object>("Estado", "Oops...", $"{respuesta.msj}", "error");
+        }
+    }
+
+    async Task PostOrderDetails()
+    {
+        string json = JsonConvert.SerializeObject(orderDetails);
+        StringContent httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var responses = await http.PostAsync("api/OrderDetails", httpContent);
+    }
+
+    async Task OnInputChange(ChangeEventArgs change)
+    {
+        if (change.Value.ToString().Length > 3)
+        {
+            var response = await http.GetFromJsonAsync<Products>($"api/Products/code/{change.Value}");
+            orderDatailsPreview.Price = response.Price;
+            orderDatailsPreview.Stock = response.Stock;
+            orderDatailsPreview.NamePoduct = response.Name;
+        }
+    }
+
+    async Task DeleteProductTable(OrderDetails orderD)
+    {
+        orderDetails.Remove(orderD);
+        await grid.Reload();
+    }
+
+
+    void OnChange(object value)
+    {
+        IdCustomer = (int)value;
+        Console.WriteLine(value);
+
+    }
+    void Limpiar()
+    {
+        orderDetails = new List<OrderDetails>();
+        code = null;
+        orderDatailsPreview = new OrderDatailsPreview();
+
+    }
+
+
+
+}

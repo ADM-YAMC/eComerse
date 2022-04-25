@@ -1,0 +1,110 @@
+﻿
+@page "/products"
+
+@inject HttpClient http
+@inject IJSRuntime Js
+
+<div class="row border-bottom">
+    <div class="col">
+        <h1>Products</h1>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button type="button" @onclick="@(()=> products = new Products())" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Add
+        </button>
+    </div>
+</div>
+
+<RadzenCard>
+    @if (productsList != null)
+    {
+        @if (productsList.Count != 0)
+        {
+            <RadzenDataGrid AllowFiltering="true" @ref="grid" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="6"
+                            AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                            Data="@productsList" TItem="Products" ColumnWidth="300px"
+                            LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Products" Property="Name" Title="Name" Width="100px" />
+                    <RadzenDataGridColumn TItem="Products" Property="ProductCode" Title="ProductCode" Width="100px" />
+                    <RadzenDataGridColumn TItem="Products" Property="Price" Title="Price" Width="80px" />
+                    <RadzenDataGridColumn TItem="Products" Property="Stock" Title="Stock" Width="100px" />
+                    <RadzenDataGridColumn TItem="Products" Property="Description" Title="Description" Width="150px" />
+                    <RadzenDataGridColumn TItem="Products" Title="Opciones" Width="70px" Filterable="false">
+                        <Template Context="data">
+                            <div class="col d-flex justify-content-center">
+                                <RadzenButton Style="display:inline; margin-right:4px;" Icon="edit" ButtonStyle="ButtonStyle.Success" />
+                                <RadzenButton Style="display:inline" Icon="delete_forever" ButtonStyle="ButtonStyle.Danger" />
+
+                            </div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No se encontraron datos...
+            </div>
+        }
+    }
+    else
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+</RadzenCard>
+
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add products</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm Model="products" OnValidSubmit="@PostProducts">
+                <DataAnnotationsValidator />
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <InputText @bind-Value="products.Name" class="form-control"></InputText>
+                        <ValidationMessage For="@(()=> products.Name)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Product code</label>
+                        <InputText @bind-Value="products.ProductCode" class="form-control"></InputText>
+                        <ValidationMessage For="@(()=> products.ProductCode)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <InputNumber class="form-control" @bind-Value="products.Price"></InputNumber>
+                        <ValidationMessage For="@(()=> products.Price)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <InputNumber @bind-Value="products.Stock" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(()=> products.Stock)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <InputTextArea @bind-Value="products.Description" class="form-control"></InputTextArea>
+                        <ValidationMessage For="@(()=> products.Description)" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
